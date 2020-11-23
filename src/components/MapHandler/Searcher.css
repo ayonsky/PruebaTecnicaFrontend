@@ -1,0 +1,26 @@
+.Searcher {
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    transform: translate(-50%);
+    top:  30px;
+    font-size: 10px;
+}
+
+.Searcher span {
+    text-overflow: ellipsis;
+}
+
+.autocomplete-dropdown-container {
+    width:185px;
+}
+
+.location-search-input {
+    border: 0;
+    border-radius: 2px;
+    height: 25px;
+    width: 185px;
+    -moz-box-shadow: 2px -2px 5px grey;
+    -webkit-box-shadow:2px -2px 5px grey;
+    box-shadow: 2px -2px 5px grey;
+}
