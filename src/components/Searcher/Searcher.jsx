@@ -17,7 +17,6 @@ class Searcher extends Component {
         geocodeByAddress(address)
             .then(results => getLatLng(results[0]))
             .then(latLng => {
-            console.log('Success', latLng);
             let markers = this.props.markers;
             markers.push(latLng);
             this.props.setMapCenter(latLng);
@@ -26,7 +25,7 @@ class Searcher extends Component {
             .catch(error => console.error('Error', error));
     };
 
-    render() {console.log("Searcher render:",this.props)
+    render() {
         return( 
         <div>
             <PlacesAutocomplete
