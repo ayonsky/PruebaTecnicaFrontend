@@ -1,102 +1,27 @@
 import React, { Component } from 'react';
-import './Searcher.css';
+import { connect } from "react-redux";
 import {Map, Marker, GoogleApiWrapper} from 'google-maps-react';
-import PlacesAutocomplete, {
-  geocodeByAddress,
-  getLatLng,
-} from 'react-places-autocomplete';
+import Searcher from '../Searcher/Searcher';
 
-export class MapContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      address: '',
-      showingInfoWindow: false,
-      activeMarker: {},
-      selectedPlace: {},
-      mapCenter: {
-        lat: 40.4378698,
-        lng: -3.8196207
-      },
-      markers: []
-    };
-  }
-
-  handleChange = address => {
-    this.setState({ address });
-  };
- 
-  handleSelect = address => {
-    this.setState({ address });
-    geocodeByAddress(address)
-      .then(results => getLatLng(results[0]))
-      .then(latLng => {
-        console.log('Success', latLng);
-        let markers = this.state.markers;
-        markers.push(latLng);
-        this.setState({ 
-          mapCenter: latLng,
-          markers 
-        });
-      })
-      .catch(error => console.error('Error', error));
-  };
- 
+export class MapHandler extends Component { 
   render() {
     return (
       <div id='googleMaps'>
-        <PlacesAutocomplete
-          value={this.state.address}
-          onChange={this.handleChange}
-          onSelect={this.handleSelect}
-        >
-          {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-            <div className="Searcher">
-              <input
-                {...getInputProps({
-                  placeholder: 'Search Places ...',
-                  className: 'location-search-input',
-                })}
-              />
-              <div className="autocomplete-dropdown-container">
-                {loading && <div>Loading...</div>}
-                {suggestions.map(suggestion => {
-                  const className = suggestion.active
-                    ? 'suggestion-item--active'
-                    : 'suggestion-item';
-
-                  const style = suggestion.active
-                    ? { backgroundColor: '#fafafa', cursor: 'pointer' }
-                    : { backgroundColor: '#ffffff', cursor: 'pointer' };
-                  return (
-                    <div
-                      {...getSuggestionItemProps(suggestion, {
-                        className,
-                        style,
-                      })}
-                    >
-                      <span>{suggestion.description}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </PlacesAutocomplete>
+        <Searcher />
         <Map 
           google={this.props.google}
           initialCenter={{
-            lat: this.state.mapCenter.lat,
-            lng: this.state.mapCenter.lng
+            lat: this.props.mapCenter.lat,
+            lng: this.props.mapCenter.lng
           }}
           center={{
-            lat: this.state.mapCenter.lat,
-            lng: this.state.mapCenter.lng
+            lat: this.props.mapCenter.lat,
+            lng: this.props.mapCenter.lng
           }}
           fullscreenControl = {false}
           disableDefaultUI = {true}
         >
-          {this.state.markers.map((marker, index) => {
+          {this.props.markers.map((marker, index) => {
             return (<Marker 
               key={index}
               position={marker} />)
@@ -106,6 +31,30 @@ export class MapContainer extends Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    address: state.address,
+    showingInfoWindow: state.showingInfoWindow,
+    activeMarker: state.activeMarker,
+    selectedPlace: state.selectedPlace,
+    mapCenter: state.mapCenter,
+    markers: state.markers
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+      setAddress: address => dispatch({type:"SET_ADDRESS", payload: address}),
+      setMapCenter: newCords => dispatch({type:"SET_MAP_CENTER", payload: newCords}),
+      setMarkers: markers => dispatch({type:"SET_MARKERS", payload: markers}),
+  };
+};
+
+const MapContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(MapHandler);
 
 export default GoogleApiWrapper({
   apiKey: ('AIzaSyAY2-ifr_nouCf9GlMA5rcMAwUcqDrtcnk')
